@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DES Visualizer - Data Encryption Standard (FIPS PUB 46-3)</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Striped Awning Accent Bar -->
+  <div class="top-awning" aria-hidden="true"></div>
+
+  <div class="container">
+
+    <!-- Header Teknis Spesifikasi -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-badge">DES 64</div>
+        <div>
+          <h1 class="brand-title">DES Visualizer</h1>
+          <p class="brand-subtitle">Simulasi Interaktif Kriptografi Standar FIPS PUB 46-3</p>
+        </div>
+      </div>
+
+      <div class="spec-badges">
+        <span class="spec-tag">Blok: <strong>64 Bit</strong></span>
+        <span class="spec-tag">Kunci: <strong>56 Bit Efektif</strong></span>
+        <span class="spec-tag">Feistel: <strong>16 Putaran</strong></span>
+        <span class="spec-tag ok" id="header-nist-tag">NIST 46-3: <strong>[OK]</strong></span>
+      </div>
+    </header>
+
+    <!-- Navigasi Tab Kerja -->
+    <nav class="nav-tabs" aria-label="Navigasi Menu Utama">
+      <button class="tab-btn active" data-target="pane-encrypt" type="button">1. Enkripsi 64-Bit & Pipeline</button>
+      <button class="tab-btn" data-target="pane-decrypt" type="button">2. Dekripsi 64-Bit & Audit</button>
+      <button class="tab-btn" data-target="pane-nist" type="button">3. Kalibrasi Vektor NIST</button>
+      <button class="tab-btn" data-target="pane-library" type="button">4. Katalog Konstanta Kriptografi</button>
+    </nav>
+
+    <!-- ====================================================================
+         1. PANEL ENKRIPSI
+         ==================================================================== -->
+    <main id="pane-encrypt" class="tab-content active">
+
+      <!-- Form Parameter Enkripsi -->
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Parameter Enkripsi DES (Mode ECB dengan Padding PKCS#7)</h2>
+            <p class="panel-desc">Menerima teks UTF-8 sembarang dan kunci 8 byte ASCII. Data diproses per blok 64-bit melalui 16 putaran Feistel.</p>
+          </div>
+        </div>
+
+        <!-- Wadah Notifikasi Error Inline -->
+        <div id="enc-error-box" class="error-banner" style="display: none;" role="alert"></div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label class="field-label" for="enc-plaintext">
+              <span>Teks Plaintext (UTF-8)</span>
+              <span id="enc-plain-stats" class="note">12 Byte | 2 Blok 64-bit</span>
+            </label>
+            <textarea id="enc-plaintext" class="textarea-input" rows="3" placeholder="Masukkan teks plaintext...">Hello World!</textarea>
+            <div class="preset-container">
+              <span class="preset-label">Contoh Masukan:</span>
+              <button type="button" class="preset-btn preset-plain" data-val="Hello World!">Hello World! (12 Byte)</button>
+              <button type="button" class="preset-btn preset-plain" data-val="PESAN">PESAN (5 Byte)</button>
+              <button type="button" class="preset-btn preset-plain" data-val="EXACT-64">EXACT-64 (8 Byte)</button>
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label" for="enc-key">
+              <span>Kunci Rahasia (Tepat 8 Karakter ASCII / 64 Bit)</span>
+              <span id="enc-key-stats" class="note">8 / 8 Karakter [Sesuai]</span>
+            </label>
+            <input type="text" id="enc-key" class="input-text input-mono" maxlength="8" value="mykunci8">
+            <div class="preset-container">
+              <span class="preset-label">Kunci Uji:</span>
+              <button type="button" class="preset-btn preset-key" data-val="mykunci8">mykunci8</button>
+              <button type="button" class="preset-btn preset-key" data-val="SECURITY">SECURITY</button>
+              <button type="button" class="preset-btn preset-key" data-val="12345678">12345678</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button id="btn-run-encrypt" class="btn-primary" type="button">Jalankan Enkripsi 64-bit</button>
+          <label class="chk-label">
+            <input type="checkbox" id="chk-auto-open-pipeline">
+            <span>Buka visualisasi alur proses otomatis setelah eksekusi</span>
+          </label>
+        </div>
+      </section>
+
+      <!-- Ringkasan Hasil Enkripsi (Mesin Standar Cepat) -->
+      <section id="enc-result-card" class="result-banner" style="display: none;">
+        <div class="result-banner-header">
+          <span class="result-tag-ok">[OK] ENKRIPSI 64-BIT SELESAI</span>
+          <div class="result-actions">
+            <span id="res-cipher-len" class="result-metric"></span>
+            <button id="btn-send-to-decrypt" class="btn-secondary" type="button">Pindahkan Ciphertext ke Tab Dekripsi</button>
+          </div>
+        </div>
+
+        <div class="output-grid">
+          <div class="output-cell">
+            <div class="output-label">
+              <span>CIPHERTEXT (FORMAT HEKSADESIMAL)</span>
+              <button class="btn-copy copy-btn" data-copy="res-cipher-hex" type="button">Salin Hex</button>
+            </div>
+            <div id="res-cipher-hex" class="output-value"></div>
+          </div>
+
+          <div class="output-cell">
+            <div class="output-label">
+              <span>CIPHERTEXT (FORMAT BASE64)</span>
+              <button class="btn-copy copy-btn" data-copy="res-cipher-b64" type="button">Salin Base64</button>
+            </div>
+            <div id="res-cipher-b64" class="output-value"></div>
+          </div>
+        </div>
+
+        <!-- Tombol Buka / Tutup Visualisasi Proses -->
+        <div class="pipeline-launch-bar">
+          <div class="pipeline-launch-text">
+            <div class="launch-title">ANALISIS INTERNAL PROSES KRIPTOGRAFI</div>
+            <div class="launch-sub">Periksa langkah-demi-langkah: Padding PKCS#7, Pabrik 16 Subkunci, Permutasi IP, 16 Putaran Feistel, dan Swap/FP.</div>
+          </div>
+          <button id="btn-toggle-pipeline" class="btn-toggle-pipeline" type="button">
+            Tampilkan Visualisasi Alur Proses (5 Tahap)
+          </button>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           VISUALISASI PIPELINE 5 TAHAP (HANYA TAMPIL JIKA USER MEMILIH MELIHAT)
+           ==================================================================== -->
+      <section id="enc-pipeline-steps" class="pipeline-section" style="display: none;">
+
+        <!-- Navigasi Langkah Stepper -->
+        <div class="pipeline-step-nav" role="tablist">
+          <button type="button" class="step-nav-btn active" data-step="1">1. Padding PKCS#7</button>
+          <button type="button" class="step-nav-btn" data-step="2">2. Pabrik Subkunci</button>
+          <button type="button" class="step-nav-btn" data-step="3">3. Permutasi Awal</button>
+          <button type="button" class="step-nav-btn" data-step="4">4. Feistel 16x</button>
+          <button type="button" class="step-nav-btn" data-step="5">5. Swap & FP</button>
+          <button type="button" class="step-nav-btn all-steps-btn" data-step="all">Tampilkan Semua</button>
+        </div>
+
+        <!-- Bilah Pemilih Blok Data Aktif -->
+        <div id="pipeline-block-selector" class="block-selector-bar">
+          <div class="block-selector-label">
+            <strong>Blok Data yang Sedang Dianalisis:</strong>
+            <span id="current-block-caption" class="note">Blok 1 dari 1 (Byte 0 s.d. 7)</span>
+          </div>
+          <div id="pipeline-block-pills" class="block-pills-list"></div>
+        </div>
+
+        <!-- TAHAP 1: PEMOTONGAN BLOK & PADDING -->
+        <article class="step-container" id="step-box-1">
+          <div class="step-header">
+            <div class="step-label-group">
+              <span class="step-idx">1</span>
+              <div>
+                <h3 class="step-title">Tahap 1: Pemotongan Blok 64-bit dan Penambahan Padding PKCS#7</h3>
+                <p class="step-sub">DES memproses data dalam unit 8 byte (64 bit). Jika panjang data bukan kelipatan 8, byte pengganjal ditambahkan.</p>
+              </div>
+            </div>
+            <button id="btn-toggle-pad-info" class="btn-subtoggle" type="button">Tampilkan Penjelasan Teknis</button>
+          </div>
+          <div class="step-body">
+            <div class="data-label">Susunan Blok Data & Slot Byte (Biru: Data Asli, Merah: Byte Padding):</div>
+            <div id="blocks-conveyor-render" class="blocks-list"></div>
+
+            <!-- Detail Tersembunyi -->
+            <div id="pad-info-box" class="collapsible-content" style="display: none;">
+              <div class="data-label">Rincian Perhitungan Padding:</div>
+              <div id="padding-description-text" class="code-box"></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- TAHAP 2: PABRIK 16 SUBKUNCI -->
+        <article class="step-container" id="step-box-2">
+          <div class="step-header">
+            <div class="step-label-group">
+              <span class="step-idx emerald">2</span>
+              <div>
+                <h3 class="step-title">Tahap 2: Pabrik 16 Subkunci (Key Schedule)</h3>
+                <p class="step-sub">Kunci 64-bit melewati Permuted Choice 1 (PC-1) untuk membuang 8 bit paritas, menghasilkan inti 56-bit (C0 dan D0).</p>
+              </div>
+            </div>
+            <button id="btn-toggle-subkeys" class="btn-subtoggle" type="button">Tampilkan Daftar 16 Subkunci</button>
+          </div>
+          <div class="step-body">
+            <div class="two-col-grid">
+              <div>
+                <div class="data-label">KUNCI UTAMA ASLI (64 BIT):</div>
+                <div id="ks-key64-display" class="code-box"></div>
+              </div>
+              <div>
+                <div class="data-label">KUNCI SETELAH PC-1 (56 BIT INTI):</div>
+                <div id="ks-key56-display" class="code-box"></div>
+              </div>
+            </div>
+
+            <div class="two-col-grid">
+              <div>
+                <div class="data-label blue-label">REGISTER C0 (28 BIT KIRI):</div>
+                <div id="ks-c0-display" class="code-box"></div>
+              </div>
+              <div>
+                <div class="data-label amber-label">REGISTER D0 (28 BIT KANAN):</div>
+                <div id="ks-d0-display" class="code-box"></div>
+              </div>
+            </div>
+
+            <!-- Detail Tersembunyi: Grid 16 Subkunci & Shift Visualizer -->
+            <div id="subkeys-grid-wrap" class="collapsible-content" style="display: none;">
+              <div class="notice-box red-notice" style="margin-top: 10px;">
+                <strong>Aturan PC-1:</strong> Bit 8, 16, 24, 32, 40, 48, 56, 64 dibuang dari kunci 64-bit.
+              </div>
+              <div class="data-label">16 Subkunci 48-bit (Klik subkunci untuk melihat rincian putaran dan pergeseran bit):</div>
+              <div id="subkeys-grid-render" class="subkey-grid"></div>
+              <div id="selected-subkey-detail"></div>
+
+              <!-- Simulator Pergeseran Melingkar C & D -->
+              <div class="shift-simulator-box" style="margin-top: 16px;">
+                <div class="data-label emerald-label">SIMULASI PERGESERAN MELINGKAR REGISTER C & D (CIRCULAR LEFT SHIFT):</div>
+                <div class="shift-control-bar">
+                  <span style="font-size: 0.78rem; font-weight: 700;">Pilih Putaran Kunci:</span>
+                  <div id="shift-round-pills" class="round-pills-compact"></div>
+                </div>
+                <div id="shift-live-breakdown" class="shift-live-card"></div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- TAHAP 3: INITIAL PERMUTATION -->
+        <article class="step-container" id="step-box-3">
+          <div class="step-header">
+            <div class="step-label-group">
+              <span class="step-idx indigo">3</span>
+              <div>
+                <h3 class="step-title">Tahap 3: Permutasi Awal (Initial Permutation - IP)</h3>
+                <p class="step-sub">Bit-bit blok 64-bit ditata ulang menurut tabel baku IP, lalu dibelah menjadi L0 (32-bit) dan R0 (32-bit).</p>
+              </div>
+            </div>
+            <button id="btn-toggle-ip-info" class="btn-subtoggle" type="button">Tampilkan Susunan Bit IP</button>
+          </div>
+          <div class="step-body">
+            <div class="two-col-grid">
+              <div>
+                <div class="data-label blue-label">BLOK KIRI: L0 (32 BIT)</div>
+                <div id="l0-bits-display" class="code-box"></div>
+              </div>
+              <div>
+                <div class="data-label amber-label">BLOK KANAN: R0 (32 BIT)</div>
+                <div id="r0-bits-display" class="code-box"></div>
+              </div>
+            </div>
+
+            <!-- Detail Tersembunyi -->
+            <div id="ip-info-box" class="collapsible-content" style="display: none;">
+              <div class="data-label">HASIL LENGKAP INITIAL PERMUTATION (64 BIT):</div>
+              <div id="ip-bits-display" class="code-box"></div>
+            </div>
+          </div>
+        </article>
+
+        <!-- TAHAP 4: JARINGAN FEISTEL 16 PUTARAN -->
+        <article class="step-container" id="step-box-4">
+          <div class="step-header">
+            <div class="step-label-group">
+              <span class="step-idx amber">4</span>
+              <div>
+                <h3 class="step-title">Tahap 4: Jaringan Feistel 16 Putaran</h3>
+                <p class="step-sub">Sisi Kiri baru mengambil R lama. Sisi Kanan baru dibentuk dari L lama XOR fungsi Feistel f(R lama, K).</p>
+              </div>
+            </div>
+            <button id="btn-toggle-sbox-inspector" class="btn-subtoggle" type="button">Tampilkan Detail Kotak-S</button>
+          </div>
+          <div class="step-body">
+
+            <!-- Kontrol Interaktif Stepper Putaran -->
+            <div class="round-control">
+              <div class="round-nav-buttons">
+                <button id="btn-feistel-prev" class="btn-step" type="button" title="Putaran Sebelumnya">Putaran Sebelumnya</button>
+                <span id="feistel-round-stamp" class="round-badge">Putaran 01 / 16</span>
+                <button id="btn-feistel-next" class="btn-step" type="button" title="Putaran Berikutnya">Putaran Berikutnya</button>
+              </div>
+              <input type="range" id="feistel-round-slider" class="round-slider" min="1" max="16" value="1" aria-label="Slider Putaran Feistel">
+              <button id="btn-play-feistel" class="btn-secondary" type="button">Mulai Putar Otomatis</button>
+            </div>
+
+            <!-- Visual Alur Data Putaran Aktif -->
+            <div class="feistel-grid">
+              <div class="feistel-col left">
+                <div class="feistel-col-title blue">
+                  <span>Sisi Kiri (L)</span>
+                  <span>32 Bit</span>
+                </div>
+                <div class="data-label">L Lama:</div>
+                <div id="f-l-old" class="code-box" style="margin-bottom: 6px;"></div>
+                <div class="data-label">L Baru = R Lama:</div>
+                <div id="f-l-new" class="code-box"></div>
+              </div>
+
+              <div class="feistel-col right">
+                <div class="feistel-col-title amber">
+                  <span>Sisi Kanan (R)</span>
+                  <span>32 Bit</span>
+                </div>
+                <div class="data-label">R Lama:</div>
+                <div id="f-r-old" class="code-box" style="margin-bottom: 6px;"></div>
+                <div class="data-label">R Baru = L Lama XOR f(R, K):</div>
+                <div id="f-r-new" class="code-box"></div>
+              </div>
+
+              <!-- Fungsi f(R, K) Ringkasan & 6 Sublangkah -->
+              <div class="feistel-col f-func">
+                <div class="feistel-col-title indigo">
+                  <span>Fungsi Feistel f(R, K)</span>
+                  <span id="f-subkey-label" class="sub-mono-title"></span>
+                </div>
+
+                <div class="three-col-grid" style="margin-bottom: 14px;">
+                  <div>
+                    <div class="data-label">1. Ekspansi E-Box (32 ke 48 bit):</div>
+                    <div id="f-ebox-out" class="code-box"></div>
+                  </div>
+                  <div>
+                    <div class="data-label">2. XOR Subkunci K (48 bit):</div>
+                    <div id="f-xor-out" class="code-box"></div>
+                  </div>
+                  <div>
+                    <div class="data-label">4. Permutasi P-Box (32 ke 32 bit):</div>
+                    <div id="f-pbox-out" class="code-box"></div>
+                  </div>
+                </div>
+
+                <!-- Bilah 6 Sublangkah Feistel -->
+                <div class="feistel-substep-nav">
+                  <div class="substep-header-label">
+                    <strong>Dekomposisi Logika Putaran Aktif:</strong>
+                    <span class="note">Pilih sublangkah untuk memeriksa transformasi bit fungsi Feistel:</span>
+                  </div>
+                  <div class="substep-buttons" role="tablist">
+                    <button type="button" class="substep-btn active" data-substep="1">1. Ambil R Lama</button>
+                    <button type="button" class="substep-btn" data-substep="2">2. E-Box (32-&gt;48)</button>
+                    <button type="button" class="substep-btn" data-substep="3">3. XOR Kunci</button>
+                    <button type="button" class="substep-btn" data-substep="4">4. 8 Kotak-S</button>
+                    <button type="button" class="substep-btn" data-substep="5">5. P-Box (32-&gt;32)</button>
+                    <button type="button" class="substep-btn" data-substep="6">6. XOR L Lama = R</button>
+                  </div>
+                  <div id="feistel-substep-content" class="substep-live-panel"></div>
+                </div>
+
+                <!-- Inspeksi Interaktif Kotak-S (Tersembunyi di Awal) -->
+                <div id="sbox-inspector-wrap" class="sbox-section" style="display: none;">
+                  <div class="sbox-heading">
+                    3. Substitusi Kotak-S (48 ke 32 bit) — Pilih Kotak-S untuk Melihat Koordinat Baris & Kolom:
+                  </div>
+
+                  <div class="sbox-bar" role="tablist">
+                    <button type="button" class="sbox-btn active" data-sbox="0">S1</button>
+                    <button type="button" class="sbox-btn" data-sbox="1">S2</button>
+                    <button type="button" class="sbox-btn" data-sbox="2">S3</button>
+                    <button type="button" class="sbox-btn" data-sbox="3">S4</button>
+                    <button type="button" class="sbox-btn" data-sbox="4">S5</button>
+                    <button type="button" class="sbox-btn" data-sbox="5">S6</button>
+                    <button type="button" class="sbox-btn" data-sbox="6">S7</button>
+                    <button type="button" class="sbox-btn" data-sbox="7">S8</button>
+                  </div>
+
+                  <div id="sbox-lookup-info" class="sbox-info-text"></div>
+                  <div id="sbox-matrix-table-render" class="table-responsive"></div>
+
+                  <!-- Sandbox Simulasi 6-Bit Mandiri -->
+                  <div class="sbox-sandbox-box" style="margin-top: 16px;">
+                    <div class="sandbox-header">
+                      <strong>Simulator Masukan 6-Bit Mandiri (Klik bit untuk mengubah 0 / 1):</strong>
+                      <button type="button" id="btn-sync-sbox-bits" class="btn-step" style="font-size: 0.74rem;">Salin Bit dari Putaran Aktif</button>
+                    </div>
+                    <div class="bit-toggle-group">
+                      <div class="bit-toggle-cell">
+                        <span class="bit-idx-label">b1 (Baris)</span>
+                        <button type="button" class="btn-bit-toggle" data-bitidx="0" id="bit-btn-0">0</button>
+                      </div>
+                      <div class="bit-toggle-cell">
+                        <span class="bit-idx-label">b2 (Kolom)</span>
+                        <button type="button" class="btn-bit-toggle" data-bitidx="1" id="bit-btn-1">0</button>
+                      </div>
+                      <div class="bit-toggle-cell">
+                        <span class="bit-idx-label">b3 (Kolom)</span>
+                        <button type="button" class="btn-bit-toggle" data-bitidx="2" id="bit-btn-2">0</button>
+                      </div>
+                      <div class="bit-toggle-cell">
+                        <span class="bit-idx-label">b4 (Kolom)</span>
+                        <button type="button" class="btn-bit-toggle" data-bitidx="3" id="bit-btn-3">0</button>
+                      </div>
+                      <div class="bit-toggle-cell">
+                        <span class="bit-idx-label">b5 (Kolom)</span>
+                        <button type="button" class="btn-bit-toggle" data-bitidx="4" id="bit-btn-4">0</button>
+                      </div>
+                      <div class="bit-toggle-cell">
+                        <span class="bit-idx-label">b6 (Baris)</span>
+                        <button type="button" class="btn-bit-toggle" data-bitidx="5" id="bit-btn-5">0</button>
+                      </div>
+                    </div>
+                    <div id="sbox-sandbox-result" class="sandbox-result-text"></div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- TAHAP 5: 32-BIT SWAP & FP -->
+        <article class="step-container" id="step-box-5">
+          <div class="step-header">
+            <div class="step-label-group">
+              <span class="step-idx slate">5</span>
+              <div>
+                <h3 class="step-title">Tahap 5: 32-Bit Swap dan Final Permutation (FP)</h3>
+                <p class="step-sub">Setelah putaran ke-16, blok ditukar menjadi R16 || L16 lalu melalui permutasi akhir FP (invers dari IP).</p>
+              </div>
+            </div>
+            <button id="btn-toggle-swap-info" class="btn-subtoggle" type="button">Tampilkan Penjelasan Teknis</button>
+          </div>
+          <div class="step-body">
+            <div class="two-col-grid">
+              <div>
+                <div class="data-label">32-BIT SWAP: R16 || L16 (64 BIT)</div>
+                <div id="swap-result-display" class="code-box"></div>
+              </div>
+              <div>
+                <div class="data-label">OUTPUT FINAL PERMUTATION (FP) (64 BIT)</div>
+                <div id="fp-result-display" class="code-box"></div>
+              </div>
+            </div>
+
+            <!-- Detail Tersembunyi -->
+            <div id="swap-info-box" class="collapsible-content" style="display: none;">
+              <div class="code-box">
+                Penukaran (Swap) 32-bit dilakukan agar proses enkripsi dan dekripsi menggunakan sirkuit logika Feistel yang identik. Pada saat dekripsi, subkunci dimasukkan terbalik dari K16 ke K1.
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </section>
+    </main>
+
+    <!-- ====================================================================
+         2. PANEL DEKRIPSI
+         ==================================================================== -->
+    <section id="pane-decrypt" class="tab-content">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Dekripsi Ciphertext (Pembalikan Feistel dengan Subkunci K16 ke K1)</h2>
+            <p class="panel-desc">Memanfaatkan sifat simetris jaringan Feistel. Algoritma menjalankan sirkuit yang sama dengan memasukkan subkunci dalam urutan terbalik.</p>
+          </div>
+        </div>
+
+        <div id="dec-error-box" class="error-banner" style="display: none;" role="alert"></div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label class="field-label" for="dec-ciphertext">
+              <span>Ciphertext Input</span>
+              <div class="radio-group">
+                <label><input type="radio" name="dec-format" value="hex" checked> Format HEX</label>
+                <label><input type="radio" name="dec-format" value="base64"> Format Base64</label>
+              </div>
+            </label>
+            <textarea id="dec-ciphertext" class="textarea-input input-mono" rows="3" placeholder="Masukkan string ciphertext heksadesimal atau Base64..."></textarea>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label" for="dec-key">
+              <span>Kunci Dekripsi (Tepat 8 Karakter ASCII)</span>
+              <span id="dec-key-stats" class="note">8 / 8 Karakter</span>
+            </label>
+            <input type="text" id="dec-key" class="input-text input-mono" maxlength="8" value="mykunci8">
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button id="btn-run-decrypt" class="btn-primary" type="button">Jalankan Dekripsi 64-bit</button>
+        </div>
+      </div>
+
+      <!-- Hasil Dekripsi Standar -->
+      <div id="dec-result-card" class="result-banner result-banner-blue" style="display: none;">
+        <div class="result-banner-header">
+          <span class="result-tag-ok" style="color: var(--color-blue);">[OK] DEKRIPSI 64-BIT SELESAI</span>
+        </div>
+
+        <div class="dec-output-card">
+          <div class="data-label">PLAINTEXT HASIL DEKRIPSI:</div>
+          <div id="res-dec-plain" class="dec-plain-text"></div>
+          <div id="res-dec-unpad-info" class="dec-unpad-text"></div>
+        </div>
+
+        <!-- Tombol Buka / Tutup Tabel Audit Dekripsi -->
+        <div style="margin-top: 14px; text-align: right;">
+          <button id="btn-toggle-dec-audit" class="btn-subtoggle" type="button">
+            Tampilkan Tabel Audit 16 Putaran Dekripsi
+          </button>
+        </div>
+
+        <!-- Tabel Audit Tersembunyi -->
+        <div id="dec-audit-wrap" class="collapsible-content" style="display: none; margin-top: 14px;">
+          <div class="data-label">Audit 16 Putaran Mundur (Urutan Subkunci K16 s.d. K1):</div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Putaran & Subkunci</th>
+                  <th>Subkunci 48-bit (HEX)</th>
+                  <th>L Baru (32-bit)</th>
+                  <th>R Baru (32-bit)</th>
+                </tr>
+              </thead>
+              <tbody id="dec-audit-rounds"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         3. PANEL VERIFIKASI NIST
+         ==================================================================== -->
+    <section id="pane-nist" class="tab-content">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Verifikasi Resmi Standar NIST (FIPS PUB 46-3)</h2>
+            <p class="panel-desc">Validasi keakuratan matematis algoritma terhadap Vektor Uji Resmi dari National Institute of Standards and Technology.</p>
+          </div>
+          <button id="btn-run-nist" class="btn-secondary" type="button">Verifikasi Ulang Vektor NIST</button>
+        </div>
+
+        <div id="nist-status-tag" class="nist-status-box">
+          [OK] STANDAR NIST FIPS PUB 46-3 TERVERIFIKASI (100% SESUAI)
+        </div>
+
+        <div class="four-col-grid">
+          <div class="output-cell">
+            <div class="output-label">KUNCI UJI RESMI NIST:</div>
+            <div id="nist-key-val" class="output-value">133457799BBCDFF1</div>
+          </div>
+          <div class="output-cell">
+            <div class="output-label">PLAINTEXT UJI RESMI NIST:</div>
+            <div id="nist-plain-val" class="output-value">0123456789ABCDEF</div>
+          </div>
+          <div class="output-cell">
+            <div class="output-label">CIPHERTEXT EKSPEKTASI FIPS 46-3:</div>
+            <div id="nist-expected-val" class="output-value">85E813540F0AB405</div>
+          </div>
+          <div class="output-cell">
+            <div class="output-label">CIPHERTEXT HASIL KALKULASI:</div>
+            <div id="nist-actual-val" class="output-value" style="color: var(--color-emerald);">85E813540F0AB405</div>
+          </div>
+        </div>
+
+        <!-- Tombol Tampilkan Rincian 16 Putaran NIST -->
+        <div style="margin-top: 14px; text-align: right;">
+          <button id="btn-toggle-nist-audit" class="btn-subtoggle" type="button">
+            Tampilkan Rincian 16 Putaran Vektor NIST
+          </button>
+        </div>
+
+        <!-- Tabel Audit NIST Tersembunyi -->
+        <div id="nist-audit-wrap" class="collapsible-content" style="display: none; margin-top: 14px;">
+          <div class="data-label" style="margin-bottom: 8px;">Audit 16 Putaran Uji Vektor NIST:</div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Putaran</th>
+                  <th>Subkunci 48-bit (HEX)</th>
+                  <th>L Output (HEX)</th>
+                  <th>R Output (HEX)</th>
+                </tr>
+              </thead>
+              <tbody id="nist-audit-rounds-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====================================================================
+         4. PANEL KATALOG TABEL STANDAR
+         ==================================================================== -->
+    <section id="pane-library" class="tab-content">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Katalog Konstanta Standar FIPS PUB 46-3</h2>
+            <p class="panel-desc">Pilih matriks atau tabel spesifikasi yang ingin diperiksa.</p>
+          </div>
+        </div>
+
+        <!-- Pemilih Tabel Interaktif -->
+        <div class="catalog-selector-row">
+          <label class="catalog-select-label" for="catalog-table-select">Pilih Tabel Matriks:</label>
+          <select id="catalog-table-select" class="select-input">
+            <option value="ip">1. Initial Permutation (IP) — 64 ke 64 Bit</option>
+            <option value="fp">2. Final Permutation (FP / IP⁻¹) — 64 ke 64 Bit</option>
+            <option value="ebox">3. Expansion Table (E-Box) — 32 ke 48 Bit</option>
+            <option value="pbox">4. Permutation Table (P-Box) — 32 ke 32 Bit</option>
+            <option value="pc1">5. Permuted Choice 1 (PC-1) — 64 ke 56 Bit</option>
+            <option value="pc2">6. Permuted Choice 2 (PC-2) — 56 ke 48 Bit</option>
+            <option value="shifts">7. Jadwal Pergeseran Bit (Shift Schedule) — 16 Putaran</option>
+            <option value="sboxes">8. Matriks Kotak-S (S1 s.d. S8) — 4 x 16</option>
+          </select>
+        </div>
+
+        <!-- Wadah Tampilan Tabel Terpilih -->
+        <div id="catalog-table-display" class="catalog-display-box">
+          <div id="catalog-table-header" class="catalog-table-title blue-label"></div>
+          <div id="catalog-table-desc" class="catalog-desc-text"></div>
+          <div id="catalog-sbox-pills" class="sbox-bar" style="display: none; margin-top: 10px;">
+            <button type="button" class="sbox-btn active" data-catsbox="0">S1</button>
+            <button type="button" class="sbox-btn" data-catsbox="1">S2</button>
+            <button type="button" class="sbox-btn" data-catsbox="2">S3</button>
+            <button type="button" class="sbox-btn" data-catsbox="3">S4</button>
+            <button type="button" class="sbox-btn" data-catsbox="4">S5</button>
+            <button type="button" class="sbox-btn" data-catsbox="5">S6</button>
+            <button type="button" class="sbox-btn" data-catsbox="6">S7</button>
+            <button type="button" class="sbox-btn" data-catsbox="7">S8</button>
+          </div>
+          <div id="catalog-matrix-render" class="table-responsive" style="margin-top: 12px;"></div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="des-core.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

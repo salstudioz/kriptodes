@@ -1,0 +1,1598 @@
+/* ==============================================================================
+   DES VISUALIZER - STYLESHEET TEKNIS RESMI
+   Standar: FIPS PUB 46-3 (Data Encryption Standard)
+   Gaya: Clean Flat Blueprint Technical Workbench (Inspirasi Game/Anime UI Sheet)
+   Aturan Ketat: Border-radius <= 8px, Kontras Tinggi, Tanpa AI Slop / Glow
+   ============================================================================== */
+
+:root {
+  /* Palet Warna Fungsional Berbasis Peran Data */
+  --bg-app: #f1f5f9;
+  --bg-card: #ffffff;
+  --bg-subtle: #f8fafc;
+  --border-color: #cbd5e1;
+  --border-dark: #334155;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+
+  /* Kode Warna Standar Kriptografi */
+  --color-blue: #2563eb;          /* Plaintext & Blok Kiri (L) */
+  --color-blue-bg: #eff6ff;
+  --color-blue-border: #bfdbfe;
+
+  --color-amber: #d97706;         /* Blok Kanan (R) & Inti Feistel */
+  --color-amber-bg: #fffbeb;
+  --color-amber-border: #fde68a;
+
+  --color-emerald: #059669;       /* Kunci Utama & 16 Subkunci K1-K16 */
+  --color-emerald-bg: #ecfdf5;
+  --color-emerald-border: #a7f3d0;
+
+  --color-indigo: #4f46e5;        /* Operasi Logika (XOR, S-Box, P-Box) */
+  --color-indigo-bg: #eef2ff;
+  --color-indigo-border: #c7d2fe;
+
+  --color-red: #dc2626;           /* Bit Dibuang & Paritas PC-1 */
+  --color-red-bg: #fef2f2;
+  --color-red-border: #fecaca;
+
+  /* Tipografi */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Menlo, Consolas, monospace;
+
+  /* Radius Maksimal 8px */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
+  font-size: 14px;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* ==============================================================================
+   KANOPIS STRIPED (AKSEN GAME / TECHNICAL UI SHEET)
+   ============================================================================== */
+.top-awning {
+  height: 12px;
+  width: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    #2563eb,
+    #2563eb 20px,
+    #ffffff 20px,
+    #ffffff 40px
+  );
+  border-bottom: 2px solid var(--border-dark);
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 20px 24px;
+}
+
+/* ==============================================================================
+   HEADER TEKNIS
+   ============================================================================== */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid var(--border-dark);
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.brand-badge {
+  background: #0f172a;
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.95rem;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border-dark);
+  letter-spacing: 0.5px;
+}
+
+.brand-title {
+  font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.spec-badges {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.spec-tag {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 5px 10px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.spec-tag strong {
+  color: var(--text-main);
+  font-family: var(--font-mono);
+}
+
+.spec-tag.ok {
+  background: var(--color-emerald-bg);
+  border-color: var(--color-emerald-border);
+  color: var(--color-emerald);
+}
+
+/* ==============================================================================
+   TAB NAVIGASI
+   ============================================================================== */
+.nav-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 2px solid var(--border-dark);
+  margin-bottom: 20px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.tab-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-bottom: none;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  padding: 10px 18px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tab-btn:hover {
+  background: var(--bg-subtle);
+  color: var(--color-blue);
+}
+
+.tab-btn:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: -2px;
+}
+
+.tab-btn.active {
+  background: var(--color-blue);
+  color: #ffffff;
+  border-color: var(--border-dark);
+  border-bottom: 2px solid var(--color-blue);
+  margin-bottom: -2px;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* ==============================================================================
+   KARTU & PANEL UTAMA
+   ============================================================================== */
+.panel {
+  background: var(--bg-card);
+  border: 2px solid var(--border-dark);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 0 var(--border-dark);
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.panel-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: 0.3px;
+}
+
+.panel-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ==============================================================================
+   FORMULIR & KONTROL MASUKAN
+   ============================================================================== */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.field-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.field-label .note {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.textarea-input, .input-text {
+  background: var(--bg-subtle);
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.88rem;
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  transition: border-color 0.12s ease;
+  width: 100%;
+}
+
+.textarea-input:focus, .input-text:focus, .select-input:focus {
+  outline: none;
+  border-color: var(--color-blue);
+  background: #ffffff;
+}
+
+.input-mono {
+  font-family: var(--font-mono);
+}
+
+.preset-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.preset-label {
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.preset-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  font-size: 0.74rem;
+  font-family: var(--font-mono);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.preset-btn:hover {
+  background: var(--bg-subtle);
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  background: var(--color-blue);
+  color: #ffffff;
+  border: 2px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 10px 22px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 0 var(--border-dark);
+  transition: all 0.12s ease;
+  letter-spacing: 0.3px;
+  min-height: 42px;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: none;
+}
+
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  min-height: 38px;
+}
+
+.btn-secondary:hover {
+  background: var(--bg-subtle);
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+.chk-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.chk-label input[type="checkbox"] {
+  cursor: pointer;
+  accent-color: var(--color-blue);
+}
+
+/* Notifikasi Error Inline */
+.error-banner {
+  background: var(--color-red-bg);
+  border: 1.5px solid var(--color-red-border);
+  color: var(--color-red);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+/* ==============================================================================
+   HASIL EKSEKUSI (BANNER HASIL STANDAR)
+   ============================================================================== */
+.result-banner {
+  background: var(--bg-card);
+  border: 2px solid var(--border-dark);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 0 var(--border-dark);
+}
+
+.result-banner-blue {
+  border-color: var(--color-blue);
+}
+
+.result-banner-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.result-tag-ok {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--color-emerald);
+  font-family: var(--font-mono);
+  letter-spacing: 0.5px;
+}
+
+.result-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.result-metric {
+  font-size: 0.8rem;
+  color: var(--color-emerald);
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.output-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+.output-cell {
+  background: #ffffff;
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+}
+
+.output-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.output-value {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  word-break: break-all;
+  line-height: 1.4;
+}
+
+.btn-copy {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: var(--text-main);
+  transition: all 0.1s ease;
+}
+
+.btn-copy:hover {
+  background: var(--color-blue-bg);
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+/* ==============================================================================
+   BAR PELUNCUR VISUALISASI PIPELINE (TOGGLE UTAMA)
+   ============================================================================== */
+.pipeline-launch-bar {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1.5px dashed var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pipeline-launch-text {
+  flex: 1;
+  min-width: 240px;
+}
+
+.launch-title {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+}
+
+.launch-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.btn-toggle-pipeline {
+  background: var(--color-blue);
+  color: #ffffff;
+  border: 2px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.12s ease;
+  box-shadow: 0 2px 0 var(--border-dark);
+  white-space: nowrap;
+  min-height: 42px;
+}
+
+.btn-toggle-pipeline:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.btn-toggle-pipeline.active {
+  background: #334155;
+  border-color: #0f172a;
+}
+
+/* ==============================================================================
+   NAVIGASI STEPPER PIPELINE
+   ============================================================================== */
+.pipeline-section {
+  animation: fadeIn 0.2s ease-out;
+}
+
+.pipeline-step-nav {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+}
+
+.step-nav-btn {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  flex-shrink: 0;
+}
+
+.step-nav-btn:hover {
+  background: var(--bg-subtle);
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+.step-nav-btn.active {
+  background: var(--color-blue);
+  color: #ffffff;
+  border-color: var(--border-dark);
+  box-shadow: 0 1px 0 var(--border-dark);
+}
+
+.step-nav-btn.all-steps-btn {
+  border-style: dashed;
+}
+
+/* ==============================================================================
+   BILAH PEMILIH BLOK DATA AKTIF (MULTI-BLOCK SELECTOR)
+   ============================================================================== */
+.block-selector-bar {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  box-shadow: 0 1px 0 var(--border-dark);
+}
+
+.block-selector-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.block-selector-label strong {
+  font-size: 0.84rem;
+  color: var(--text-main);
+}
+
+.block-pills-list {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.block-pill-btn {
+  background: var(--bg-subtle);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  white-space: nowrap;
+}
+
+.block-pill-btn:hover {
+  background: var(--color-blue-bg);
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+.block-pill-btn.active {
+  background: var(--color-blue);
+  color: #ffffff;
+  border-color: var(--border-dark);
+}
+
+/* ==============================================================================
+   KONTEN TAHAP-DEMI-TAHAP PIPELINE
+   ============================================================================== */
+.step-container {
+  background: var(--bg-card);
+  border: 2px solid var(--border-dark);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 0 var(--border-dark);
+}
+
+.step-header {
+  background: var(--bg-subtle);
+  border-bottom: 1.5px solid var(--border-color);
+  padding: 12px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.step-label-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  flex: 1;
+  min-width: 240px;
+}
+
+.step-idx {
+  background: var(--color-blue);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.88rem;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border-dark);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.step-idx.emerald { background: var(--color-emerald); }
+.step-idx.indigo { background: var(--color-indigo); }
+.step-idx.amber { background: var(--color-amber); }
+.step-idx.slate { background: #475569; }
+
+.step-title {
+  font-size: 0.94rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.step-sub {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.btn-subtoggle {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  white-space: nowrap;
+}
+
+.btn-subtoggle:hover {
+  background: var(--bg-subtle);
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+.btn-subtoggle.active {
+  background: #334155;
+  color: #ffffff;
+  border-color: #0f172a;
+}
+
+.step-body {
+  padding: 20px;
+}
+
+.collapsible-content {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-color);
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.data-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+  letter-spacing: 0.3px;
+}
+
+.blue-label { color: var(--color-blue); }
+.amber-label { color: var(--color-amber); }
+.emerald-label { color: var(--color-emerald); }
+.indigo-label { color: var(--color-indigo); }
+
+.code-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-main);
+  word-break: break-all;
+  line-height: 1.4;
+  margin-bottom: 10px;
+}
+
+.two-col-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.three-col-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.four-col-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.notice-box {
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+}
+
+.red-notice {
+  background: var(--color-red-bg);
+  border: 1px solid var(--color-red-border);
+  color: var(--color-red);
+}
+
+/* Ban Berjalan Blok (Tahap 1) */
+.blocks-list {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin-bottom: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.block-box {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  min-width: 300px;
+  overflow: hidden;
+  box-shadow: 0 1px 0 var(--border-dark);
+  flex-shrink: 0;
+  transition: border-color 0.15s ease;
+}
+
+.block-box.active-block {
+  border-color: var(--color-blue);
+  box-shadow: 0 0 0 2px var(--color-blue);
+}
+
+.block-head {
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-color);
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+}
+
+.slots-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  background: var(--border-color);
+  gap: 1px;
+}
+
+.slot-item {
+  background: #ffffff;
+  padding: 8px 4px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.slot-item.pad {
+  background: var(--color-red-bg);
+  color: var(--color-red);
+}
+
+/* Subkey Grid (Tahap 2) */
+.subkey-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.subkey-item {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 6px 4px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.subkey-item:hover {
+  background: var(--color-emerald-bg);
+  border-color: var(--color-emerald);
+}
+
+.subkey-item.active {
+  background: var(--color-emerald);
+  color: #ffffff;
+  border-color: var(--border-dark);
+}
+
+.subkey-item.active div {
+  color: #ffffff !important;
+}
+
+/* Simulator Pergeseran Melingkar C & D */
+.shift-simulator-box {
+  background: #ffffff;
+  border: 1.5px solid var(--color-emerald-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.shift-control-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.round-pills-compact {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.shift-pill-btn {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 0.74rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.shift-pill-btn:hover {
+  background: var(--color-emerald-bg);
+  border-color: var(--color-emerald);
+}
+
+.shift-pill-btn.active {
+  background: var(--color-emerald);
+  color: #ffffff;
+  border-color: var(--border-dark);
+}
+
+.shift-live-card {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  line-height: 1.6;
+}
+
+/* ==============================================================================
+   KONTROL PUTARAN FEISTEL (TAHAP 4)
+   ============================================================================== */
+.round-control {
+  background: var(--bg-subtle);
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.round-nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-step {
+  background: #ffffff;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  min-height: 36px;
+}
+
+.btn-step:hover {
+  background: var(--bg-subtle);
+  border-color: var(--color-blue);
+  color: var(--color-blue);
+}
+
+.btn-step:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.round-badge {
+  background: var(--color-amber);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.84rem;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-dark);
+  white-space: nowrap;
+}
+
+.round-slider {
+  flex: 1;
+  min-width: 160px;
+  height: 6px;
+  cursor: pointer;
+  accent-color: var(--color-amber);
+}
+
+.feistel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.feistel-col {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.feistel-col.f-func {
+  grid-column: 1 / -1;
+  border-color: var(--color-indigo-border);
+  background: var(--color-indigo-bg);
+}
+
+.feistel-col-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding-bottom: 6px;
+  border-bottom: 1.5px solid var(--border-color);
+  margin-bottom: 10px;
+}
+
+.feistel-col-title.blue { color: var(--color-blue); }
+.feistel-col-title.amber { color: var(--color-amber); }
+.feistel-col-title.indigo { color: var(--color-indigo); }
+
+.sub-mono-title {
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+/* Bilah 6 Sublangkah Feistel */
+.feistel-substep-nav {
+  background: #ffffff;
+  border: 1.5px solid var(--color-indigo-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-top: 14px;
+}
+
+.substep-header-label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.substep-header-label strong {
+  font-size: 0.84rem;
+  color: var(--color-indigo);
+}
+
+.substep-buttons {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.substep-btn {
+  background: var(--bg-subtle);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.substep-btn:hover {
+  background: var(--color-indigo-bg);
+  border-color: var(--color-indigo);
+  color: var(--color-indigo);
+}
+
+.substep-btn.active {
+  background: var(--color-indigo);
+  color: #ffffff;
+  border-color: var(--border-dark);
+}
+
+.substep-live-panel {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+/* S-Box Selector Bar */
+.sbox-section {
+  border-top: 1px solid var(--border-color);
+  padding-top: 12px;
+  margin-top: 10px;
+}
+
+.sbox-heading {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 8px;
+}
+
+.sbox-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sbox-btn {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 5px 12px;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.78rem;
+  cursor: pointer;
+  color: var(--color-indigo);
+  flex-shrink: 0;
+}
+
+.sbox-btn:hover {
+  background: var(--color-indigo-bg);
+  border-color: var(--color-indigo);
+}
+
+.sbox-btn.active {
+  background: var(--color-indigo);
+  color: #ffffff;
+  border-color: var(--border-dark);
+}
+
+.sbox-info-text {
+  font-size: 0.78rem;
+  color: var(--text-main);
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  font-family: var(--font-mono);
+  line-height: 1.5;
+}
+
+/* Sandbox Simulasi 6-Bit */
+.sbox-sandbox-box {
+  background: #ffffff;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.sandbox-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.bit-toggle-group {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.bit-toggle-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.bit-idx-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.btn-bit-toggle {
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  color: var(--text-main);
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-bit-toggle:hover {
+  border-color: var(--color-indigo);
+}
+
+.btn-bit-toggle.on {
+  background: var(--color-indigo);
+  color: #ffffff;
+  border-color: var(--border-dark);
+}
+
+.sandbox-result-text {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+/* ==============================================================================
+   TABEL DATA & MATRIKS RESPONSIF
+   ============================================================================== */
+.table-responsive {
+  overflow-x: auto;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  -webkit-overflow-scrolling: touch;
+}
+
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.76rem;
+  background: #ffffff;
+  text-align: center;
+}
+
+.matrix-table th, .matrix-table td {
+  border: 1px solid var(--border-color);
+  padding: 5px 4px;
+}
+
+.matrix-table th {
+  background: var(--bg-subtle);
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
+.matrix-table tr.active-row td {
+  background: #fdf2f8;
+}
+
+.matrix-table td.highlight {
+  background: var(--color-indigo) !important;
+  color: #ffffff !important;
+  font-weight: 800;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  background: #ffffff;
+}
+
+.data-table th, .data-table td {
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.data-table th {
+  background: var(--bg-subtle);
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.data-table code {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+/* ==============================================================================
+   PANEL DEKRIPSI
+   ============================================================================== */
+.dec-output-card {
+  background: #ffffff;
+  border: 1.5px solid var(--color-blue-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+.dec-plain-text {
+  font-size: 1.35rem;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  color: var(--color-blue);
+  word-break: break-all;
+  margin: 6px 0;
+}
+
+.dec-unpad-text {
+  font-size: 0.8rem;
+  color: var(--color-emerald);
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+/* ==============================================================================
+   PANEL NIST
+   ============================================================================== */
+.nist-status-box {
+  margin-bottom: 16px;
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: var(--color-emerald);
+  background: var(--color-emerald-bg);
+  border: 1.5px solid var(--color-emerald-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+}
+
+/* ==============================================================================
+   PANEL KATALOG INTERAKTIF
+   ============================================================================== */
+.catalog-selector-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.catalog-select-label {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.select-input {
+  background: #ffffff;
+  border: 1.5px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--text-main);
+  cursor: pointer;
+  max-width: 100%;
+}
+
+.catalog-display-box {
+  background: var(--bg-card);
+  border: 1.5px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 18px;
+}
+
+.catalog-table-title {
+  font-weight: 800;
+  font-size: 0.86rem;
+  margin-bottom: 4px;
+  letter-spacing: 0.3px;
+}
+
+.catalog-desc-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Radio Group */
+.radio-group {
+  display: flex;
+  gap: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.radio-group label {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ==============================================================================
+   RESPONSIVITAS MOBILE (< 768px & < 480px)
+   ============================================================================== */
+@media (max-width: 768px) {
+  .container {
+    padding: 12px;
+  }
+
+  .app-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .brand-section {
+    width: 100%;
+  }
+
+  .spec-badges {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .panel {
+    padding: 16px;
+  }
+
+  .panel-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .output-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pipeline-launch-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-toggle-pipeline {
+    width: 100%;
+    text-align: center;
+  }
+
+  .block-selector-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .step-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .step-label-group {
+    width: 100%;
+  }
+
+  .btn-subtoggle {
+    margin-top: 6px;
+    align-self: flex-start;
+  }
+
+  .round-control {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .round-nav-buttons {
+    justify-content: space-between;
+  }
+
+  .round-slider {
+    width: 100%;
+  }
+
+  .feistel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .two-col-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .three-col-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .four-col-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .brand-title {
+    font-size: 1.15rem;
+  }
+
+  .tab-btn {
+    padding: 8px 12px;
+    font-size: 0.8rem;
+  }
+
+  .btn-primary {
+    width: 100%;
+    text-align: center;
+  }
+
+  .block-box {
+    min-width: 260px;
+  }
+
+  .slot-item {
+    font-size: 0.7rem;
+    padding: 6px 2px;
+  }
+
+  .btn-bit-toggle {
+    width: 34px;
+    height: 34px;
+    font-size: 0.9rem;
+  }
+}
